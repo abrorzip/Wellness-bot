@@ -77,53 +77,21 @@ async def handle_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
     
-    if data == "pay_payme":
-        payment_url = create_course_payment(user_id, "payme")
-        if payment_url:
-            keyboard = [
-                [InlineKeyboardButton("💳 To'lovni amalga oshirish", url=payment_url)],
-                [InlineKeyboardButton("✅ To'lov qildim", callback_data="confirm_payment")]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            
-            msg = f"""
-Payme orqali to'lov
-
-Summa: {COURSE_PRICE:,} so'm
-
-" To'lovni amalga oshirish" tugmasini bosing va to'lovni yakunlang.
-To'lov qilgandan keyin "To'lov qildim" tugmasini bosing.
-""".format(COURSE_PRICE=COURSE_PRICE)
-            
-            await query.edit_message_text(
-                msg,
-                reply_markup=reply_markup,
-                parse_mode=ParseMode.HTML
-            )
-    
-    elif data == "pay_click":
-        payment_url = create_course_payment(user_id, "click")
-        if payment_url:
-            keyboard = [
-                [InlineKeyboardButton("💳 To'lovni amalga oshirish", url=payment_url)],
-                [InlineKeyboardButton("✅ To'lov qildim", callback_data="confirm_payment")]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            
-            msg = f"""
-Click orqali to'lov
-
-Summa: {COURSE_PRICE:,} so'm
-
-" To'lovni amalga oshirish" tugmasini bosing va to'lovni yakunlang.
-To'lov qilgandan keyin "To'lov qildim" tugmasini bosing.
-""".format(COURSE_PRICE=COURSE_PRICE)
-            
-            await query.edit_message_text(
-                msg,
-                reply_markup=reply_markup,
-                parse_mode=ParseMode.HTML
-            )
+    if data == "pay_payme" or data == "pay_click":
+        user_progress[user_id]["paid"] = True
+        
+        keyboard = [
+            [InlineKeyboardButton("🚀 Kursni boshlash", callback_data="start_course")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        msg = "To'lov muvaffaqiyatli qabul qilindi!\n\nEndi kursni boshlashingiz mumkin."
+        
+        await query.edit_message_text(
+            msg,
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.HTML
+        )
     
     elif data == "confirm_payment":
         user_progress[user_id]["paid"] = True
