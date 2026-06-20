@@ -445,6 +445,8 @@ def main():
 
     if WEBHOOK and WEBHOOK_URL:
         print(f"Webhook rejimda ishlayapti: {WEBHOOK_URL}")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         application.run_webhook(
             listen="0.0.0.0",
             port=8443,
