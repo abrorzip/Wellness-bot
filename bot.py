@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
@@ -459,6 +460,8 @@ def main():
     
     if WEBHOOK and WEBHOOK_URL:
         print(f"Webhook rejimda ishlayapti: {WEBHOOK_URL}")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         application.run_webhook(
             listen="0.0.0.0",
             port=8443,
