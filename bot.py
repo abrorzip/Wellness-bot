@@ -3,7 +3,6 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
 import random
-import asyncio
 from config import (
     TELEGRAM_BOT_TOKEN, WELCOME_MESSAGE, START_MESSAGE,
     WRONG_ANSWER_MESSAGES, CORRECT_ANSWER_MESSAGES, FINAL_MESSAGE,
@@ -460,21 +459,12 @@ def main():
     
     if WEBHOOK and WEBHOOK_URL:
         print(f"Webhook rejimda ishlayapti: {WEBHOOK_URL}")
-        
-        async def webhook_main():
-            await application.initialize()
-            await application.start()
-            await application.updater.start_webhook(
-                listen="0.0.0.0",
-                port=8443,
-                url_path="bot",
-                webhook_url=f"{WEBHOOK_URL}/bot"
-            )
-            await application.updater.idle()
-            await application.stop()
-            await application.shutdown()
-        
-        asyncio.run(webhook_main())
+        application.run_webhook(
+            listen="0.0.0.0",
+            port=8443,
+            url_path="bot",
+            webhook_url=f"{WEBHOOK_URL}/bot"
+        )
     else:
         print("Polling rejimda ishlayapti...")
         application.run_polling(allowed_updates=Update.ALL_TYPES)
