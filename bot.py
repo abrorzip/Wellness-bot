@@ -28,16 +28,16 @@ async def health(request):
 
 
 async def webhook_handler(request):
-    app = request.app["bot_app"]
-    update = Update.de_json(await request.json(), app.bot)
-    await app.update_queue.put(update)
+    application = request.app["bot_app"]
+    update = Update.de_json(await request.json(), application.bot)
+    await application.update_queue.put(update)
     return web.Response()
 
 
 async def on_startup(app):
-    await app.bot.initialize()
-    await app.bot.start()
-    await app.bot.set_webhook(
+    await app["bot_app"].initialize()
+    await app["bot_app"].start()
+    await app["bot_app"].bot.set_webhook(
         url=f"{WEBHOOK_URL}/webhook",
         allowed_updates=Update.ALL_TYPES
     )
@@ -45,8 +45,8 @@ async def on_startup(app):
 
 
 async def on_shutdown(app):
-    await app.bot.stop()
-    await app.bot.shutdown()
+    await app["bot_app"].stop()
+    await app["bot_app"].shutdown()
 
 
 async def start(update: Update, context):
