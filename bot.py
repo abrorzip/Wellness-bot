@@ -1,7 +1,6 @@
 import logging
 import asyncio
 import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
@@ -23,23 +22,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 user_progress = {}
-
-
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/plain")
-        self.end_headers()
-        self.wfile.write(b"OK")
-
-    def log_message(self, format, *args):
-        pass
-
-
-def start_health_server():
-    port = int(os.getenv("PORT", 8080))
-    server = HTTPServer(("0.0.0.0", port), HealthHandler)
-    server.serve_forever()
 
 
 def get_keyboard_lesson(lesson_number):
@@ -408,9 +390,7 @@ Davom eting!
 
 
 def main():
-    health_thread = threading.Thread(target=start_health_server, daemon=True)
-    health_thread.start()
-    print("Health server ishga tushdi...")
+    print("Bot ishga tushdi...")
 
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
@@ -444,12 +424,11 @@ def main():
     ))
 
     if WEBHOOK and WEBHOOK_URL:
-        print(f"Webhook rejimda ishlayapti: {WEBHOOK_URL}")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        port = int(os.getenv("PORT", 8443))
+        print(f"Webhook rejimda ishlayapti: {WEBHOOK_URL} port: {port}")
         application.run_webhook(
             listen="0.0.0.0",
-            port=8443,
+            port=port,
             url_path="bot",
             webhook_url=f"{WEBHOOK_URL}/bot"
         )
